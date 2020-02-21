@@ -40,6 +40,10 @@ inquirer
               if (err) throw err;
               console.table(res);
             });
+            connection.query("SELECT * FROM result", function(err, res) {
+              if (err) throw err;
+              console.table(res);
+            });
       } else if (selection === "Add") {
           inquirer.prompt([
               {
@@ -88,17 +92,85 @@ inquirer
 
                 connection.query("INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)", [firstName, lastName, role, manager], function(err, res) {
                     if (err) throw err;
-                    console.table(res);
                   });
                 connection.query("INSERT INTO department (name) VALUES (?)", [department], function(err, res) {
                     if (err) throw err;
-                    console.table(res);
                   });
                 connection.query("INSERT INTO role (salary, title) VALUES (?, ?)", [salary, title], function(err, res) {
                     if (err) throw err;
+                  });
+                connection.query ("DROP TABLE IF EXISTS result", function(err, res) {
+                    if (err) throw err;
+                  });
+                connection.query ("CREATE TABLE result AS (SELECT role.title, role.salary, employee.first_name, employee.last_name FROM role INNER JOIN employee on role.id=employee.role_id)", function(err, res) {
+                     if (err) throw err;
+                   });
+                   console.log("Employee added");
+                
+        }); 
+      } else if (selection === "Update") {
+        inquirer.prompt([
+            {
+              type: "list",
+              name: "titleSalary",
+              message: "Would you like to change the salary or title of an employee?", 
+              choices: ['Title', 'Salary']
+            },
+        ]).then(resultUpdate => {
+            var newUpdate = resultUpdate.titleSalary;
+
+            if (newUpdate === 'Title') {
+              inquirer.prompt([
+                {
+                    type: "input",
+                    name: "titleChange",
+                    message: "Enter the ID of the employee you'd like to change."
+                },
+                {
+                  type: "input",
+                  name: "titleChange2",
+                  message: "Enter the employee's new title."
+              },
+              ]).then(lastMatch => {
+                var ID = lastMatch.titleChange;
+                var newTitle = lastMatch.titleChange2;
+      
+                connection.query("UPDATE role SET title = (?) WHERE id = (?)", [newTitle, ID], function(err, res) {
+                  if (err) throw err;
+                  connection.query("SELECT * FROM role", function(err, res) {
+                    if (err) throw err;
                     console.table(res);
                   });
-        }); 
+                });
+              });
+            } else if (newUpdate === 'Salary') {
+              inquirer.prompt([
+                {
+                    type: "input",
+                    name: "salaryChange",
+                    message: "Enter the ID of the employee you'd like to change."
+                },
+                {
+                  type: "input",
+                  name: "salaryChange2",
+                  message: "Enter the employee's new salary in decimal format."
+              },
+              ]).then(lastMatch => {
+                var ID = lastMatch.titleChange;
+                var newSalary = lastMatch.salaryChange2;
+      
+                connection.query("UPDATE role SET salary = (?) WHERE id = (?)", [newSalary, ID], function(err, res) {
+                  if (err) throw err;
+                  connection.query("SELECT * FROM role", function(err, res) {
+                    if (err) throw err;
+                    console.table(res);
+                  });
+                });
+              });
+            } 
+            
+        });
+          
       }
 });
 
@@ -107,3 +179,10 @@ inquirer
 app.listen(PORT, function() {
     console.log("Server listening on: http://localhost:" + PORT);
   });
+
+
+
+
+
+  
+
