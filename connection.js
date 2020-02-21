@@ -155,11 +155,11 @@ inquirer
                   name: "salaryChange2",
                   message: "Enter the employee's new salary in decimal format."
               },
-              ]).then(lastMatch => {
-                var ID = lastMatch.titleChange;
-                var newSalary = lastMatch.salaryChange2;
+              ]).then(lastMatch2 => {
+                var ID2 = lastMatch2.salaryChange;
+                var newSalary = lastMatch2.salaryChange2;
       
-                connection.query("UPDATE role SET salary = (?) WHERE id = (?)", [newSalary, ID], function(err, res) {
+                connection.query("UPDATE role SET salary = (?) WHERE id = (?)", [newSalary, ID2], function(err, res) {
                   if (err) throw err;
                   connection.query("SELECT * FROM role", function(err, res) {
                     if (err) throw err;
