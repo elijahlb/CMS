@@ -74,7 +74,7 @@ inquirer
             {
                 type: "input",
                 name: "salary",
-                message: "Enter employee's salary."
+                message: "Enter employee's salary in decimal format."
             },
             {
                 type: "input",
